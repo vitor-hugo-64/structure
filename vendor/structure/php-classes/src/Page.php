@@ -4,35 +4,60 @@ namespace ST;
 
 use Rain\Tpl;
 
-class Page
-{
-	private $config;
-	private $tpl;
+class Page {
 
-	function __construct()
-	{
-		$config = array( 
-							'tpl_dir' => 'views'.DIRECTORY_SEPARATOR, 
-							'cache_dir' => 'views-cache'.DIRECTORY_SEPARATOR 
-						);
+	private $tpl;
+	private $options = [];
+	private $defaults = [
+		"header"=>true,
+		"footer"=>true,
+		"data"=>[]
+	];
+
+	public function __construct($opts = array(), $tpl_dir = "views/"){
+		
+		$this->options = array_merge($this->defaults, $opts);
+
+		$config = array(
+			"tpl_dir"       => $tpl_dir,
+			"cache_dir"     => "views-cache/",
+			"debug"         => false
+	    );
 
 		Tpl::configure( $config );
-		
-		$this->tpl = new Tpl();
-		$this->tpl->draw( 'header');
+
+		$this->tpl = new Tpl;
+
+		$this->setData($this->options["data"]);
+
+		if ($this->options["header"] === true) $this->tpl->draw("header");
+
 	}
 
-	function __destruct()
+	private function setData($data = array())
 	{
-		$this->tpl->draw( 'footer');	
-	}
 
-	public function drawPage( $file, $params = array(null))
-	{
-		foreach ( $params as $key => $value) {
-			$this->tpl->assign( $key, $value);
+		foreach ($data as $key => $value) {
+			$this->tpl->assign($key, $value);
 		}
-		
-		$this->tpl->draw( $file);
+
 	}
+
+	public function drawPage($name, $data = array(), $returnHTML = false)
+	{
+
+		$this->setData($data);
+
+		return $this->tpl->draw($name, $returnHTML);
+
+	}
+
+	public function __destruct(){
+
+		if ($this->options["footer"] === true) $this->tpl->draw("footer");
+
+	}
+
 }
+
+ ?>

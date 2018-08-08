@@ -11,7 +11,8 @@ $app = new App($config);
 
 $app->get( '/', function ()
 {
-	echo "Hello Wolrd!";
+	$page = new Page();
+	$page->drawPage( 'index');
 });
 
 $app->run();
